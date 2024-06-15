@@ -1,0 +1,59 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      enabled: true
+      routes:
+      - id: greeting-service
+        uri: http://localhost:8080
+        predicates:
+          - Path=/ms-greeting/**
+        filters:
+          - RewritePath=/ms-greeting/(?<segment>/?.*),/api/v0/$\{segment}
+          - name: CircuitBreaker
+            args:
+              name: greeting-service
+              fallbackUri: forward:/fallback
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        slowCallRateThreshold: 75
+        slowCallDurationThreshold: 3s
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: 3s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        permittedNumberOfCallsInHalfOpenState: 5
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+    instances:
+      greeting-service:
+        baseConfig: default
+           
+  timelimiter:
+    configs:
+      default:
+        cancelRunningFuture: true
+        timeoutDuration: 5s
+    instances:
+      greeting-service:
+        baseConfig: default
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
