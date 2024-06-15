@@ -6,12 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                echo 'Checking out the source code...'
-                git url: 'https://github.com/berkguneey/test-service.git', branch: 'main'
-            }
-        }
         stage('Build') {
             steps {
                 echo 'Building...'
