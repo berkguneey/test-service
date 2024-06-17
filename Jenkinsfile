@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HOST = 'tcp://host.docker.internal:2376'
+        DOCKER_HOST = 'tcp://host.docker.internal:2375'
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
         DOCKER_IMAGE = 'berkguney/api-gateway'
     }
